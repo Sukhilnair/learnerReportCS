@@ -2,18 +2,18 @@ pipeline {
     agent any
 
     environment {
-        BACKEND_IMAGE = "your-backend-image"
-        FRONTEND_IMAGE = "your-frontend-image"
-        REGISTRY = "docker.io" // Docker Hub registry
-        DOCKER_HUB_REPO = "your-dockerhub-username" // Replace with your Docker Hub username
-        KUBE_CONTEXT = "your-kubernetes-cluster"
-        VERSION = "v${BUILD_NUMBER}" // Version based on Jenkins build number
+        GIT_REPO = "https://github.com/Sukhilnair/learnerReportCS.git"
+        DOCKER_HUB_REPO = "learnerreport"
+        REGISTRY = "docker.io"
+        DOCKER_HUB_REPO = "sukhilnair"
+        KUBE_CONTEXT = "minikube"
+        VERSION = "v${BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git branch: 'main', url: "${env.GIT_REPO}"
             }
         }
 

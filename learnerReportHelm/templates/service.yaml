@@ -1,15 +1,27 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "learnerReport.fullname" . }}
-  labels:
-    {{- include "learnerReport.labels" . | nindent 4 }}
+  name: {{ .Release.Name }}-backend-service
+  namespace: {{ .Values.backend.namespace }}
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
-    {{- include "learnerReport.selectorLabels" . | nindent 4 }}
+    app: {{ .Release.Name }}-backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-frontend-service
+  namespace: {{ .Values.frontend.namespace }}
+spec:
+  selector:
+    app: {{ .Release.Name }}-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
