@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    environment {
+        BACKEND_IMAGE = "your-backend-image"
+        FRONTEND_IMAGE = "your-frontend-image"
+        REGISTRY = "docker.io" // Docker Hub registry
+        DOCKER_HUB_REPO = "your-dockerhub-username" // Replace with your Docker Hub username
+        KUBE_CONTEXT = "your-kubernetes-cluster"
+        VERSION = "v${BUILD_NUMBER}" // Version based on Jenkins build number
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                script {
+                    sh 'cd backend && docker build -t $DOCKER_HUB_REPO/$BACKEND_IMAGE:$VERSION -t $DOCKER_HUB_REPO/$BACKEND_IMAGE:latest .'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                script {
+                    sh 'cd frontend && docker build -t $DOCKER_HUB_REPO/$FRONTEND_IMAGE:$VERSION -t $DOCKER_HUB_REPO/$FRONTEND_IMAGE:latest .'
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+                }
+            }
+        }
+
+        stage('Push Backend Image') {
+            steps {
+                script {
+                    // Push both the versioned and latest tag
+                    sh 'docker push $DOCKER_HUB_REPO/$BACKEND_IMAGE:$VERSION'
+                    sh 'docker push $DOCKER_HUB_REPO/$BACKEND_IMAGE:latest'
+                }
+            }
+        }
+
+        stage('Push Frontend Image') {
+            steps {
+                script {
+                    // Push both the versioned and latest tag
+                    sh 'docker push $DOCKER_HUB_REPO/$FRONTEND_IMAGE:$VERSION'
+                    sh 'docker push $DOCKER_HUB_REPO/$FRONTEND_IMAGE:latest'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Deploy using the specific version tag
+                    sh 'helm upgrade --install mern-stack ./mern-chart --set backend.image=$DOCKER_HUB_REPO/$BACKEND_IMAGE:$VERSION --set frontend.image=$DOCKER_HUB_REPO/$FRONTEND_IMAGE:$VERSION'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Optional: clean up Docker images after build to save space
+            sh 'docker rmi $DOCKER_HUB_REPO/$BACKEND_IMAGE:$VERSION || true'
+            sh 'docker rmi $DOCKER_HUB_REPO/$FRONTEND_IMAGE:$VERSION || true'
+        }
+    }
+}
