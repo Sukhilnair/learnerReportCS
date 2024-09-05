@@ -4,9 +4,9 @@ backend:
   containerPort: 3000
   image: learnerreportbackend:latest
   secrets:
-    ATLAS_URI: "bW9uZ29kYitzcnY6Ly9hc2VlbTpXZlB1cWFCY0hsZWN1MFV0QGNsdXN0ZXIwLmFvcnFuZHEubW9uZ29kYi5uZXQvYmxvZ19tZXJuP3JldHJ5V3JpdGVzPXRydWUmdz1tYWpvcml0eQ=="
-    HASH_KEY: "dGhpc0lzTXlIYXNoS2V5"
-    JWT_SECRET_KEY: "dGhpc0lzTXlKd3RTZWNyZXRLZXk"
+    ATLAS_URI: "mongodb+srv://aseem:VfPuqBChLeCu0U@cluster0.aorqndq.mongodb.net/blog_merne?retryWrites=true&w=majority"
+    HASH_KEY: "thisIsMyHashKey"
+    JWT_SECRET_KEY: "thisIsMyJwtSecretKey"
   resources:
     limits:
       memory: "512Mi"
