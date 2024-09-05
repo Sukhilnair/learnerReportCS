@@ -159,3 +159,5 @@ Jenkins Credentials ID: Ensure the ID matches the one used in the Jenkins pipeli
 ## Troubleshooting
 - **Base64 Encoding Errors**: Ensure all secret values in the Helm chart are base64-encoded.
 - **Deployment Issues**: Verify Kubernetes configurations and Helm chart paths.
+## Output
+![learnerReport](./learnerReport.png)
